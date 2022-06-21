@@ -5,7 +5,16 @@
         "fix": "textlint --fix */*.tex",
         "lint-style": "textlint -f checkstyle */*.tex"
     },
-    "dependencies": {
+    "dependencies": {},
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "https://github.com/haoblackj/latex-template-ja.git",
+    "author": "haoblackj <yagu001@scientia-lebensborn.com>",
+    "license": "CC0",
+    "private": true,
+    "devDependencies": {
+        "semantic-release": "^19.0.3",
+        "semantic-release-cli": "^5.4.4",
         "textlint": "^12.1.1",
         "textlint-filter-rule-allowlist": "^4.0.0",
         "textlint-filter-rule-comments": "^1.2.2",
