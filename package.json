@@ -1,21 +1,25 @@
 {
-  "name": "thesis-template-master",
   "scripts": {
     "lint": "textlint */*.tex",
     "fix": "textlint --fix */*.tex",
     "lint-style": "textlint -f checkstyle */*.tex",
-    "semantic-release": "semantic-release"
+    "postversion": "yarn changelog",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md && git commit -m 'chore(CHANGELOG.md): update changelog'"
   },
   "dependencies": {},
-  "version": "0.0.0-development",
-  "main": "index.js",
-  "repository": "https://github.com/haoblackj/latex-template-ja.git",
-  "author": "haoblackj <yagu001@scientia-lebensborn.com>",
-  "license": "CC0",
   "private": true,
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/commit-analyzer": "semantic-release/commit-analyzer",
+    "@semantic-release/exec": "semantic-release/exec",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "semantic-release/github",
+    "@semantic-release/npm": "semantic-release/npm",
+    "@semantic-release/release-notes-generator": "semantic-release/release-notes-generator",
+    "conventional-changelog-cli": "^2.2.2",
+    "cz-conventional-changelog": "^3.3.0",
     "husky": "^8.0.1",
     "semantic-release": "^19.0.3",
     "semantic-release-cli": "^5.4.4",

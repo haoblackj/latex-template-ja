@@ -1,4 +1,4 @@
-MAIN_SRC=main
+MAIN_SRC=master
 USE_DOCKER?=yes
 DOCKER_IMAGE=ghcr.io/pddg/latex:3.1.0
 

@@ -3,28 +3,68 @@ on:
   push:
     branches:
       - master
+
+env:
+  # MakefileでDockerを使う機能を無効にする
+  USE_DOCKER: no
+  # 生成するファイルの名前。
+  ARTIFACT_NAME: master.pdf
+
 jobs:
-  release:
+  build:
     runs-on: ubuntu-20.04
+    container:
+      # もし独自のDockerイメージを変更したい場合、ここを変更する
+      image: ghcr.io/haoblackj/latex-docker:latest
+      options: --user root
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
 
-      - uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      # 実際のビルドは `bin/build.sh` を実行している
+      - name: Build
+        run: ./bin/build.sh
+
+      # 生成したPDFをGitHub Actionsにアップロードする
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install dependencies
-        run: yarn install --prefer-offline
-      - name: build pdf
+          name: pdf
+          # アップロードするファイルを変更する場合、以下を変える
+          path: ./${{ env.ARTIFACT_NAME }}
+
+      - name: conventional changelog action
+        id: changelog
+      # https://github.com/TriPSs/conventional-changelog-action
+        uses: TriPSs/conventional-changelog-action@latest
+        with:
+          # you can also create separate token to trace action
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          output-file: "false"
+
+      - name: create release
+        # https://github.com/actions/create-release
+        id: create-release
+        uses: softprops/action-gh-release@v1
+        if: ${{steps.changelog.outputs.skipped == 'false'}}
         env:
+          # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+        with:
+            tag_name: ${{ steps.changelog.outputs.tag }}
+            name: ${{ steps.changelog.outputs.tag }}
+            body: ${{steps.changelog.outputs.clean_changelog}}
+            draft: false
+            prerelease: false
+
+      - name: Upload release file
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_NAME }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/pdf
+        if: ${{ steps.create-release.outputs.upload_url != null }}
