@@ -1,4 +1,5 @@
 {
+  "name": "Manual-Template",
   "scripts": {
     "lint": "textlint */*.tex",
     "fix": "textlint --fix */*.tex",

@@ -26,6 +26,12 @@ jobs:
       - name: Build
         run: ./bin/build.sh
 
+      # ここで手順書をコミットします
+      #- name: Update Manual docs
+      #  uses: stefanzweifel/git-auto-commit-action@v4.2.0
+      #  with:
+      #    commit_message: "chore(master.pdf): Update Manual docs"
+
       # 生成したPDFをGitHub Actionsにアップロードする
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -34,6 +40,42 @@ jobs:
           # アップロードするファイルを変更する場合、以下を変える
           path: ./${{ env.ARTIFACT_NAME }}
 
+      #- name: Get yarn cache directory path
+      #  id: yarn-cache-dir-path
+      #  run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      #- uses: actions/cache@v2
+      #  id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      #  with:
+      #    path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+      #    key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #    restore-keys: |
+      #      ${{ runner.os }}-yarn-
+      #- run: corepack enable
+      #- name: ls
+      #  run: ls
+
+      #- name: yarn-cache
+      #  uses: c-hive/gha-yarn-cache@v2
+
+      #- name: Install dependencies
+      #  run: yarn --check-files --frozen-lockfile --non-interactive
+
+      #- name: build pdf
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      #    # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #  run: yarn semantic-release
+
+      #- name: Release-Drafter
+      #  id: release-drafter
+      #  uses: release-drafter/release-drafter@v5
+      #  # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
+      #  # with:
+      #  #   config-name: my-config.yml
+      #  #   disable-autolabeler: true
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: conventional changelog action
         id: changelog
       # https://github.com/TriPSs/conventional-changelog-action
@@ -41,7 +83,6 @@ jobs:
         with:
           # you can also create separate token to trace action
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          output-file: "false"
 
       - name: create release
         # https://github.com/actions/create-release
@@ -58,6 +99,18 @@ jobs:
             draft: false
             prerelease: false
 
+      #- name: Re_Checkout repository
+      #  uses: actions/checkout@v3
+
+      #- name: Get release
+      #  id: get_release
+      #  uses: bruceadams/get-release@latest
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      #- uses: actions-ecosystem/action-get-latest-tag@v1
+      #  id: get-latest-tag
+        #if: ${{ steps.release-label.outputs.level != null }}
+
       - name: Upload release file
         uses: actions/upload-release-asset@v1.0.2
         env:
@@ -68,3 +121,15 @@ jobs:
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/pdf
         if: ${{ steps.create-release.outputs.upload_url != null }}
+      #- name: Upload release file
+      #  uses: xresloader/upload-to-github-release@v1
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    file: "*.pdf"
+      #    tags: false
+      #    draft: false
+      #    overwrite: true
+      #    update_latest_release: true
+      #    verbose: true
+      #    release_id: ${{ steps.get-latest-tag.outputs.id }}
