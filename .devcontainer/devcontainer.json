@@ -20,7 +20,11 @@
         "james-yu.latex-workshop",
         "EditorConfig.EditorConfig",
         "taichi.vscode-textlint",
-        "knisterpeter.vscode-commitizen"
+        "knisterpeter.vscode-commitizen",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github"
 			]
 		}
 	},
